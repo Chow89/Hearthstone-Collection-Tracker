@@ -13,6 +13,8 @@ using System.Windows.Controls;
 using HearthMirror.Enums;
 using Hearthstone_Deck_Tracker.Enums.Hearthstone;
 using Hearthstone_Deck_Tracker.Utility.Logging;
+using System.Reflection;
+using System.IO;
 
 namespace Hearthstone_Collection_Tracker
 {
@@ -21,6 +23,9 @@ namespace Hearthstone_Collection_Tracker
         public void OnLoad()
         {
             DefaultDataUpdater.PerformUpdates();
+
+            if (!Directory.Exists(PluginDataDir))
+                Directory.CreateDirectory(PluginDataDir);
 
             Settings = PluginSettings.LoadSettings(PluginDataDir);
 
@@ -87,7 +92,7 @@ namespace Hearthstone_Collection_Tracker
 
             foreach (var deckCard in deck.Cards)
             {
-                var cardSet = Settings.ActiveAccountSetsInfo.FirstOrDefault(set => set.SetName == deckCard.Set);
+                var cardSet = Settings.ActiveAccountSetsInfo.FirstOrDefault(set => set.CardSet == deckCard.CardSet);
                 var collectionCard = cardSet?.Cards.FirstOrDefault(c => c.CardId == deckCard.Id);
                 if (collectionCard == null)
                 {
@@ -170,13 +175,17 @@ namespace Hearthstone_Collection_Tracker
 
         public string Name => "Collection Tracker";
 
-        public string Description => @"Helps user to keep track on packs progess, suggesting the packs that will most probably contain missing cards. Report bugs and issues at https://github.com/HearthSim/Hearthstone-Collection-Tracker/issues";
+        public string Description => @"Helps user to keep track on packs progess, suggesting the packs that will most probably contain missing cards. 
+No longer supported by https://github.com/HearthSim/Hearthstone-Collection-Tracker
+This version built from https://github.com/batstyx/Hearthstone-Collection-Tracker";
 
         public string ButtonText => "Settings & Import";
 
         public string Author => "Vasilev Konstantin & the Community";
 
-        public static readonly Version PluginVersion = new Version(0, 8, 4);
+        public static readonly Version AssemblyVersion = Assembly.GetExecutingAssembly().GetName().Version;
+
+        public static readonly Version PluginVersion = new Version(AssemblyVersion.Major, AssemblyVersion.Minor, AssemblyVersion.Build);
 
         public Version Version => PluginVersion;
 
@@ -192,12 +201,16 @@ namespace Hearthstone_Collection_Tracker
             {
                 MainWindow = new MainWindow
                 {
+                    Left = Settings.CollectionWindowLeft,
+                    Top = Settings.CollectionWindowTop,
                     Width = Settings.CollectionWindowWidth,
                     Height = Settings.CollectionWindowHeight,
                     Filter = {OnlyMissing = !Settings.DefaultShowAllCards}
                 };
                 MainWindow.Closed += (sender, args) =>
                 {
+                    Settings.CollectionWindowLeft = MainWindow.Left;
+                    Settings.CollectionWindowTop = MainWindow.Top;
                     Settings.CollectionWindowWidth = MainWindow.Width;
                     Settings.CollectionWindowHeight = MainWindow.Height;
                     if (MainWindow.Filter != null)

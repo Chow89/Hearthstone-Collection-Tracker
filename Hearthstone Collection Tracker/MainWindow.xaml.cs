@@ -15,6 +15,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
+using Hearthstone_Collection_Tracker.Properties;
 
 namespace Hearthstone_Collection_Tracker
 {
@@ -65,7 +66,7 @@ namespace Hearthstone_Collection_Tracker
 					Title += " (" + activeAccount + ")";
 				}
             }
-			catch(Exception e)
+			catch(Exception)
 			{
 				var f = MessageBox.Show("Your Collection config file seems to be corrupted or out of date. \nReset it now?\n sorry for any inconvenience.", "Hearthstone Collection Tracker", MessageBoxButton.YesNo);
 				if(f == MessageBoxResult.Yes)
@@ -92,10 +93,11 @@ namespace Hearthstone_Collection_Tracker
 
         public FilterSettings Filter { get; set; } = new FilterSettings();
 
-        private void OpenCollectionForEditing(TrulyObservableCollection<CardInCollection> cards)
+        private void OpenCollectionForEditing(IEnumerable<CardInCollection> cards)
         {
-            CardCollectionEditor.ItemsSource = cards;
-            ListCollectionView view = (ListCollectionView)CollectionViewSource.GetDefaultView(cards);
+            var local = new TrulyObservableCollection<CardInCollection>(cards.Where(c => c.Card.Rarity != Rarity.FREE));
+            CardCollectionEditor.ItemsSource = local;
+            ListCollectionView view = (ListCollectionView)CollectionViewSource.GetDefaultView(local);
             view.Filter = CardsFilter;
             if (!view.GroupDescriptions.Any())
             {
@@ -300,7 +302,7 @@ namespace Hearthstone_Collection_Tracker
         {
             HearthstoneCollectionTrackerPlugin.Settings.SaveCurrentAccount(SetsInfo.Select(s => new BasicSetCollectionInfo
             {
-                SetName = s.SetName,
+                CardSet = s.CardSet,
                 Cards = s.SetCards.ToList()
             }).ToList());
         }
@@ -320,23 +322,32 @@ namespace Hearthstone_Collection_Tracker
         private void GetSetsInfo()
         {
             CardsInDecks.Instance.UpdateCardsInDecks();
-            this.SetsInfo = HearthstoneCollectionTrackerPlugin.Settings.ActiveAccountSetsInfo.Select(set => new SetDetailInfoViewModel
+            //this.SetsInfo = HearthstoneCollectionTrackerPlugin.Settings.ActiveAccountSetsInfo.Select(set => new SetDetailInfoViewModel
+            //{
+            //    SetName = set.SetName,
+            //    SetCards = new TrulyObservableCollection<CardInCollection>(set.Cards.ToList())
+            //}).ToList();
+
+            this.SetsInfo = SetCardsManager.CollectableSets.Select(s => new SetDetailInfoViewModel
             {
-                SetName = set.SetName,
-                SetCards = new TrulyObservableCollection<CardInCollection>(set.Cards.ToList())
+                CardSet = s,
+                SetCards = new TrulyObservableCollection<CardInCollection>(HearthstoneCollectionTrackerPlugin.Settings.ActiveAccountSetsInfo.Where(set => set.CardSet == s).FirstOrDefault().Cards.ToList()),
             }).ToList();
         }
 
         private void ManageAllCards_Click(object sender, RoutedEventArgs e)
         {
-            var collection = new TrulyObservableCollection<CardInCollection>(SetsInfo.SelectMany(si => si.SetCards).ToList());
-            OpenCollectionForEditing(collection);
+            OpenCollectionForEditing(SetsInfo.SelectMany(si => si.SetCards));
         }
 
         private void ManageStandardCards_Click(object sender, RoutedEventArgs e)
         {
-            var collection = new TrulyObservableCollection<CardInCollection>(SetsInfo.Where(s => s.IsStandardSet).SelectMany(si => si.SetCards).ToList());
-            OpenCollectionForEditing(collection);
+            OpenCollectionForEditing(SetsInfo.Where(s => s.IsStandardSet).SelectMany(si => si.SetCards));
+        }
+
+        private void ManageSelectedCards_Click(object sender, RoutedEventArgs e)
+        {
+            OpenCollectionForEditing(SetsInfo.Where(s => s.IsSelected).SelectMany(si => si.SetCards));
         }
     }
 

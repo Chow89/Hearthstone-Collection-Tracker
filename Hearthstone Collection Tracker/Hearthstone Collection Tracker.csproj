@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Hearthstone_Collection_Tracker</RootNamespace>
     <AssemblyName>HearthstoneCollectionTracker</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
@@ -56,28 +56,62 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DeckTracker|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\DeckTracker\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'PluginsFolder|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\PluginsFolder\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ControlzEx, Version=3.0.2.4, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ControlzEx.3.0.2.4\lib\net45\ControlzEx.dll</HintPath>
+    <Reference Include="HearthDb, Version=17.0.0.44582, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\HearthDb.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="HearthMirror, Version=17.0.0.44582, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\HearthMirror.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="HearthstoneDeckTracker, Version=1.1.4.0, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>packages\HearthstoneDeckTracker.exe</HintPath>
+      <HintPath>..\lib\HearthstoneDeckTracker.exe</HintPath>
       <Private>False</Private>
-    </Reference>
-    <Reference Include="MahApps.Metro, Version=1.5.0.23, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f, processorArchitecture=MSIL">
-      <HintPath>..\packages\MahApps.Metro.1.5.0\lib\net45\MahApps.Metro.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\MahApps.Metro.1.5.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
-    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -102,26 +136,14 @@
     </Compile>
     <Compile Include="HearthstoneCollectionTrackerPlugin.cs" />
     <Compile Include="Internal\CardsInDecks.cs" />
-    <Compile Include="Internal\DataUpdaters\BaseUpdaterByVersion.cs" />
-    <Compile Include="Internal\DataUpdaters\DataUpdaterV02.cs" />
-    <Compile Include="Internal\DataUpdaters\DataUpdaterV022.cs" />
-    <Compile Include="Internal\DataUpdaters\DataUpdaterV021.cs" />
-    <Compile Include="Internal\DataUpdaters\DataUpdaterV03.cs" />
-    <Compile Include="Internal\DataUpdaters\DataUpdaterV031.cs" />
-    <Compile Include="Internal\DataUpdaters\DataUpdaterV032.cs" />
-    <Compile Include="Internal\DataUpdaters\DataUpdaterV04.cs" />
-    <Compile Include="Internal\DataUpdaters\DataUpdaterV05.cs" />
-    <Compile Include="Internal\DataUpdaters\DataUpdaterV051.cs" />
-    <Compile Include="Internal\DataUpdaters\DataUpdaterV084.cs" />
-    <Compile Include="Internal\DataUpdaters\DataUpdaterV083.cs" />
-    <Compile Include="Internal\DataUpdaters\DataUpdaterV081.cs" />
-    <Compile Include="Internal\DataUpdaters\DataUpdaterV080.cs" />
-    <Compile Include="Internal\DataUpdaters\DataUpdaterV071.cs" />
-    <Compile Include="Internal\DataUpdaters\DataUpdaterV041.cs" />
+    <Compile Include="Internal\DataUpdaters\DataUpdaterV0120.cs" />
+    <Compile Include="Internal\DataUpdaters\DataUpdaterV0110.cs" />
+    <Compile Include="Internal\DataUpdaters\DataUpdaterV088.cs" />
     <Compile Include="Internal\DataUpdaters\DefaultDataUpdater.cs" />
     <Compile Include="Internal\DataUpdaters\IDataUpdater.cs" />
     <Compile Include="Internal\Helpers.cs" />
     <Compile Include="Internal\Importing\HearthstoneImporter.cs" />
+    <Compile Include="Internal\Importing\ImportHistory.cs" />
     <Compile Include="Internal\Importing\ImportingException.cs" />
     <Compile Include="Internal\InverseBooleanConverter.cs" />
     <Compile Include="Internal\ModuleVersion.cs" />
@@ -136,6 +158,7 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Properties\LibraryInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -146,7 +169,9 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="Properties\Strings.cs" />
     <Compile Include="SetCardsManager.cs" />
+    <Compile Include="SetNames.cs" />
     <Compile Include="SettingsWindow.xaml.cs">
       <DependentUpon>SettingsWindow.xaml</DependentUpon>
     </Compile>
@@ -157,10 +182,8 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <None Include="packages.config">
       <SubType>Designer</SubType>
-    </None>
+    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -197,21 +220,17 @@
     <Resource Include="Internal\HSCollection.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\HearthDb\HearthDb\HearthDb.csproj">
-      <Project>{7ed14243-e02b-4b94-af00-a67a62c282f0}</Project>
-      <Name>HearthDb</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\HearthMirror\HearthMirror\HearthMirror.csproj">
-      <Project>{1694a2f8-645a-4263-a6ab-fc26323fd675}</Project>
-      <Name>HearthMirror</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="packages\HearthstoneDeckTracker.exe" />
+    <PackageReference Include="MahApps.Metro">
+      <Version>1.6.5</Version>
+    </PackageReference>
+    <PackageReference Include="WPFLocalizeExtension">
+      <Version>3.5.0</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>if "$(ConfigurationName)" == "PluginsFolder" copy /Y "$(TargetPath)" "%25appdata%25\HearthstoneDeckTracker\Plugins\$(TargetName).dll"</PostBuildEvent>
+    <PostBuildEvent>if "$(ConfigurationName)" == "PluginsFolder" copy /Y "$(TargetPath)" "%25appdata%25\HearthstoneDeckTracker\Plugins\$(TargetName).dll"
+if "$(ConfigurationName)" == "PluginsFolder" copy /Y "$(TargetDir)$(TargetName).pdb" "%25appdata%25\HearthstoneDeckTracker\Plugins\$(TargetName).pdb"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

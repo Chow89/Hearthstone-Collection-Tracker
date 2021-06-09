@@ -1,4 +1,6 @@
-﻿using Hearthstone_Collection_Tracker.Internal;
+﻿using HearthDb.Enums;
+using Hearthstone_Collection_Tracker.Internal;
+using Hearthstone_Collection_Tracker.Properties;
 using Hearthstone_Collection_Tracker.ViewModels;
 using Hearthstone_Deck_Tracker;
 using Hearthstone_Deck_Tracker.Hearthstone;
@@ -10,9 +12,65 @@ namespace Hearthstone_Collection_Tracker
 {
     internal static class SetCardsManager
     {
-        public static readonly string[] CollectableSets = { "Classic", "Goblins vs Gnomes", "The Grand Tournament", "Whispers of the Old Gods", "Mean Streets of Gadgetzan", "Journey to Un'Goro", "Knights of the Frozen Throne", "Kobolds and Catacombs", "The Witchwood", "The Boomsday Project" };
+        public static readonly CardSet[] CollectableSets =
+        {
+            CardSet.THE_BARRENS,    // ForgedintheBarrens
+            CardSet.DARKMOON_FAIRE, // MadnessattheDarkmoonFaire
+            CardSet.SCHOLOMANCE,    // ScholomanceAcademy
+            CardSet.BLACK_TEMPLE,   // AshesOfOutland
+            CardSet.VANILLA,        // Classic
+            CardSet.EXPERT1,        // Legacy Classic
+            CardSet.HOF,            // HallofFame
+            CardSet.DRAGONS,        // DescentofDragons
+            CardSet.ULDUM,          // SaviorsofUldum
+            CardSet.DALARAN,        // RiseofShadows           
+            CardSet.TROLL,          // RastakhansRumble
+            CardSet.BOOMSDAY,       // TheBoomsdayProject
+            CardSet.GILNEAS,        // TheWitchwood
+            CardSet.LOOTAPALOOZA,   // KoboldsandCatacombs
+            CardSet.ICECROWN,       // KnightsoftheFrozenThrone
+            CardSet.UNGORO,         // JourneytoUnGoro
+            CardSet.GANGS,          // MeanStreetsofGadgetzan
+            CardSet.OG,             // WhispersoftheOldGods
+            CardSet.TGT,            // TheGrandTournament
+            CardSet.GVG,            // GoblinsvsGnomes
+        };
 
-        public static readonly string[] StandardSets = { "Classic", "Journey to Un'Goro", "Knights of the Frozen Throne", "Kobolds and Catacombs", "The Witchwood", "The Boomsday Project" };
+        public static readonly CardSet[] StandardSets =
+        {
+            CardSet.VANILLA,        // Classic
+            CardSet.BLACK_TEMPLE,   // AshesOfOutland
+            CardSet.SCHOLOMANCE,    // ScholomanceAcademy
+            CardSet.DARKMOON_FAIRE, // MadnessattheDarkmoonFaire
+            CardSet.THE_BARRENS,    // ForgedintheBarrens
+        };
+
+        public static ZodiacYear GetCardSetYear(CardSet cardSet)
+        {
+            switch (cardSet)
+            {
+                case CardSet.EXPERT1: return ZodiacYear.INVALID;        // Classic
+                case CardSet.REWARD: return ZodiacYear.INVALID;         // HallofFame
+                case CardSet.THE_BARRENS: return ZodiacYear.GRYPHON;    // ForgedintheBarrens
+                case CardSet.DARKMOON_FAIRE: return ZodiacYear.PHOENIX; // MadnessattheDarkmoonFaire
+                case CardSet.SCHOLOMANCE: return ZodiacYear.PHOENIX;    // ScholomanceAcademy
+                case CardSet.BLACK_TEMPLE: return ZodiacYear.PHOENIX;   // AshesOfOutland
+                case CardSet.DRAGONS: return ZodiacYear.DRAGON;         // DescentofDragons
+                case CardSet.ULDUM: return ZodiacYear.DRAGON;           // SaviorsofUldum
+                case CardSet.DALARAN: return ZodiacYear.DRAGON;         // RiseofShadows               
+                case CardSet.TROLL: return ZodiacYear.RAVEN;            // RastakhansRumble
+                case CardSet.BOOMSDAY: return ZodiacYear.RAVEN;         // TheBoomsdayProject
+                case CardSet.GILNEAS: return ZodiacYear.RAVEN;          // TheWitchwood
+                case CardSet.LOOTAPALOOZA: return ZodiacYear.MAMMOTH;   // KoboldsandCatacombs
+                case CardSet.ICECROWN: return ZodiacYear.MAMMOTH;       // KnightsoftheFrozenThrone
+                case CardSet.UNGORO: return ZodiacYear.MAMMOTH;         // JourneytoUnGoro
+                case CardSet.GANGS: return ZodiacYear.KRAKEN;           // MeanStreetsofGadgetzan
+                case CardSet.OG: return ZodiacYear.KRAKEN;              // WhispersoftheOldGods
+                case CardSet.TGT: return ZodiacYear.PRE_STANDARD;       // TheGrandTournament
+                case CardSet.GVG: return ZodiacYear.PRE_STANDARD;       // GoblinsvsGnomes
+                default: return ZodiacYear.INVALID;
+            }
+        }
 
         public static List<BasicSetCollectionInfo> LoadSetsInfo(string collectionStoragePath)
         {
@@ -27,13 +85,13 @@ namespace Hearthstone_Collection_Tracker
                     collection = setInfos;
                     foreach (var set in CollectableSets)
                     {
-                        var currentSetCards = cards.Where(c => c.Set.Equals(set, StringComparison.InvariantCultureIgnoreCase));
-                        var setInfo = setInfos.FirstOrDefault(si => si.SetName.Equals(set, StringComparison.InvariantCultureIgnoreCase));
+                        var currentSetCards = cards.Where(c => c.CardSet.Equals(set));
+                        var setInfo = setInfos.FirstOrDefault(si => si.CardSet.Equals(set));
                         if (setInfo == null)
                         {
                             collection.Add(new BasicSetCollectionInfo()
                             {
-                                SetName = set,
+                                CardSet = set,
                                 Cards = currentSetCards.Select(c => new CardInCollection(c)).ToList()
                             });
                         }
@@ -70,8 +128,8 @@ namespace Hearthstone_Collection_Tracker
             var cards = Database.GetActualCards();
             var setCards = CollectableSets.Select(set => new BasicSetCollectionInfo()
             {
-                SetName = set,
-                Cards = cards.Where(c => c.Set == set)
+                CardSet = set,
+                Cards = cards.Where(c => c.CardSet == set)
                         .Select(c => new CardInCollection(c))
                         .ToList()
             }).ToList();

@@ -18,6 +18,10 @@ namespace Hearthstone_Collection_Tracker.Internal
 
         public List<AccountSummary> Accounts { get; set; }
 
+        public double CollectionWindowLeft { get; set; }
+
+        public double CollectionWindowTop { get; set; }
+
         public double CollectionWindowWidth { get; set; }
 
         public double CollectionWindowHeight { get; set; }
@@ -29,6 +33,8 @@ namespace Hearthstone_Collection_Tracker.Internal
         public bool EnableDesiredCardsFeature { get; set; }
 
 		public bool EnableAutoImport { get; set; }
+
+        public bool EnableImportHistory { get; set; }
 
         public bool UseDecksForDesiredCards { get; set; }
 
@@ -155,9 +161,13 @@ namespace Hearthstone_Collection_Tracker.Internal
                         }
                     },
                     ActiveAccount = "Default",
-                    CollectionWindowWidth = 395,
-                    CollectionWindowHeight = 560,
-                    DefaultShowAllCards = false
+                    CollectionWindowLeft = 0,
+                    CollectionWindowTop = 0,
+                    CollectionWindowWidth = 825,
+                    CollectionWindowHeight = 875,
+                    DefaultShowAllCards = false,
+                    NotifyNewDeckMissingCards = true,
+                    EnableDesiredCardsFeature = true,
                 };
             }
 

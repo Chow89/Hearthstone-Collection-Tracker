@@ -11,24 +11,15 @@ namespace Hearthstone_Collection_Tracker.Internal.Importing
     {
         public int ImportStepDelay { get; set; }
 
-        public List<BasicSetCollectionInfo> Import(string importingSet)
+        public List<BasicSetCollectionInfo> Import()
         {
             var sets = SetCardsManager.CreateEmptyCollection();
-            if(!string.IsNullOrEmpty(importingSet))
-            {
-                sets = sets.Where(s => s.SetName == importingSet).ToList();
-            }
-
-            if(!sets.Any())
-            {
-                return sets;
-            }
 
             try
             {
                 var collection = Reflection.GetCollection();
-                var goldenCollection = collection.Where(x => x.Premium);
-                var commonCollection = collection.Where(x => x.Premium == false);
+                var goldenCollection = collection.Where(x => x.PremiumType == 1);
+                var commonCollection = collection.Where(x => x.PremiumType == 0);
                 foreach(var set in sets)
                 {
                     foreach(var card in set.Cards)
@@ -43,7 +34,7 @@ namespace Hearthstone_Collection_Tracker.Internal.Importing
                 }
 
             }
-            catch(ImportingException e)
+            catch(ImportingException)
             {
                 Log.Error("COLLECTION TRACKER: import exception");
                 throw;

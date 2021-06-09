@@ -11,6 +11,7 @@ using System.Windows;
 using System.Windows.Controls;
 using HearthMirror.Enums;
 using Hearthstone_Deck_Tracker.Utility.Extensions;
+using Hearthstone_Collection_Tracker.ViewModels;
 
 namespace Hearthstone_Collection_Tracker
 {
@@ -36,8 +37,9 @@ namespace Hearthstone_Collection_Tracker
             UpdateAccountsComboBox();
 
             this.DataContext = this;
-            var setsOption = SetCardsManager.CollectableSets.Select(s => new KeyValuePair<string, string>(s, s)).ToList();
-            setsOption.Insert(0, new KeyValuePair<string, string>("All", null));
+            //What does this even do???
+            //var setsOption = SetCardsManager.CollectableSets.Select(s => new KeyValuePair<string, string>(s, s)).ToList();
+            //setsOption.Insert(0, new KeyValuePair<string, string>("All", null));
             CheckboxUseDecksForDesiredCards.IsEnabled = CheckboxEnableDesiredCardsFeature.IsChecked.Value;
         }
 
@@ -143,38 +145,46 @@ namespace Hearthstone_Collection_Tracker
 			var importObject = new HearthstoneImporter();
 			try
 			{
-				var selectedSetToImport = new KeyValuePair<string, string>("All", "").Value;
-				var collection = importObject.Import(selectedSetToImport);
-				foreach(var set in collection)
+				var collection = importObject.Import();
+                var setChangesList = new List<BasicSetCollectionInfo>();
+                foreach (var set in collection)
 				{
-					var existingSet = theSettings.ActiveAccountSetsInfo.FirstOrDefault(s => s.SetName == set.SetName);
+					var existingSet = theSettings.ActiveAccountSetsInfo.FirstOrDefault(s => s.CardSet == set.CardSet);
 					if(existingSet == null)
 					{
 						theSettings.ActiveAccountSetsInfo.Add(set);
 					}
 					else
 					{
-						// keep desired amount
-						foreach(var card in set.Cards)
+                        var setChanges = setChangesList.FirstOrDefault(s => s.CardSet == set.CardSet) ?? new BasicSetCollectionInfo { CardSet = set.CardSet, Cards = new List<CardInCollection>(), };
+                        // keep desired amount
+                        foreach (var card in set.Cards)
 						{
 							var existingCardInfo = existingSet.Cards.FirstOrDefault(c => c.CardId == card.CardId);
 							if(existingCardInfo != null)
 							{
 								card.DesiredAmount = existingCardInfo.DesiredAmount;
+                                if (card.AmountNonGolden != existingCardInfo.AmountNonGolden || card.AmountGolden != existingCardInfo.AmountGolden)
+                                    setChanges?.Cards.Add(new CardInCollection(card.Card, card.AmountNonGolden - existingCardInfo.AmountNonGolden, card.AmountGolden - existingCardInfo.AmountGolden));
 							}
 						}
 						existingSet.Cards = set.Cards;
+                        if (setChanges.Cards.Count > 0)
+                            setChangesList.Add(setChanges);
 					}
 				}
-			}
-			catch(ImportingException ex)
+                if (theSettings.EnableImportHistory)
+                    ImportHistory.SaveChange(theSettings.Accounts.FirstOrDefault(a => a.AccountName == theSettings.ActiveAccount), setChangesList);
+
+            }
+			catch(ImportingException)
 			{
 				return false;
 			}
 
 
-			// save imported collection
-			HearthstoneCollectionTrackerPlugin.Settings.SaveCurrentAccount();
+			// save imported collection			
+            HearthstoneCollectionTrackerPlugin.Settings.SaveCurrentAccount();
 		    return true;
 	    }
 

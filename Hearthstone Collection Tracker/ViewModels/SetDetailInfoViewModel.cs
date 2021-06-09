@@ -1,4 +1,7 @@
-﻿using Hearthstone_Collection_Tracker.Internal;
+﻿using HearthDb.Enums;
+using Hearthstone_Collection_Tracker.Internal;
+using Hearthstone_Collection_Tracker.Properties;
+using Hearthstone_Deck_Tracker;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -20,6 +23,7 @@ namespace Hearthstone_Collection_Tracker.ViewModels
                 if (args.PropertyName == "SetCards")
                 {
                     List<CardStatsByRarity> cardStats = SetCards.GroupBy(c => c.Card.Rarity, c => c)
+                        .Where(g => g.Key != CRarity.FREE)
                         .OrderBy(g => (int)g.Key)
                         .Select(gr => new CardStatsByRarity(gr.Key.ToString(), gr.AsEnumerable()))
                         .ToList();
@@ -32,27 +36,39 @@ namespace Hearthstone_Collection_Tracker.ViewModels
 
         #region Properties
 
-        public bool IsStandardSet { get; private set; }
+        public bool IsSelected { get; set; }
 
-        private string _setName;
-        public string SetName
+        private bool _IsStandardSet;
+        public bool IsStandardSet
         {
-            get
+            get => _IsStandardSet;
+            private set
             {
-                return _setName;
-            }
-            set
-            {
-                _setName = value;
-                IsStandardSet = SetCardsManager.StandardSets.Contains(value);
+                _IsStandardSet = value;
+                IsSelected = _IsStandardSet;
             }
         }
+
+        private CardSet _CardSet;
+        public CardSet CardSet
+        {
+            get => _CardSet;
+            set
+            {
+                _CardSet = value;
+                IsStandardSet = SetCardsManager.StandardSets.Contains(value);
+            }
+        }                   
 
         public string SetDisplayingName
         {
             get
             {
-                return IsStandardSet ? SetName : SetName + " (Wild)";
+                var cardSetName = Strings.GetCardSetName(CardSet);
+                var zodiacYear = SetCardsManager.GetCardSetYear(CardSet);
+                var zodiacYearName = Strings.GetZodiacYearName(zodiacYear);
+                var zodiacSpacer = zodiacYear == ZodiacYear.INVALID ? "" : " - ";
+                return IsStandardSet ? $"{cardSetName}{zodiacSpacer}{zodiacYearName}" : $"{cardSetName}{zodiacSpacer}{zodiacYearName} (Wild)";
             }
         }
 
@@ -203,7 +219,7 @@ new Dictionary<CRarity, int>
             _cards = cards;
             Rarity = rarity;
 
-            foreach(var card in cards)
+            foreach(var card in cards.Where(c => c.Card.Rarity != CRarity.FREE))
             {
                 TotalDesiredAmount += card.ActualDesiredAmount;
                 TotalAmount += card.MaxAmountInCollection;
@@ -245,7 +261,7 @@ new Dictionary<CRarity, int>
             get
             {
                 double totalAvgDustValue = 0;
-                foreach (var group in _cards.GroupBy(c => c.Card.Rarity))
+                foreach (var group in _cards.GroupBy(c => c.Card.Rarity).Where(g => g.Key != CRarity.FREE))
                 {
                     var currentRarity = group.Key;
 
@@ -283,7 +299,7 @@ new Dictionary<CRarity, int>
             get
             {
                 double totalAvgDustValue = 0;
-                foreach(var group in _cards.GroupBy(c => c.Card.Rarity))
+                foreach(var group in _cards.GroupBy(c => c.Card.Rarity).Where(g => g.Key != CRarity.FREE))
                 {
                     var currentRarity = group.Key;
                     int maxCardsAmount = group.Sum(c => c.MaxAmountInCollection);
@@ -322,7 +338,7 @@ new Dictionary<CRarity, int>
         private double CalculateOpeningOdds(IEnumerable<CardInCollection> cards, Func<CardInCollection, int> cardsAmount, IDictionary<CRarity, double> probabilities)
         {
             double oddsForAllRaritites = 0.0;
-            foreach (var group in cards.GroupBy(c => c.Card.Rarity, c => new { card = c, amount = cardsAmount(c) }))
+            foreach (var group in cards.GroupBy(c => c.Card.Rarity, c => new { card = c, amount = cardsAmount(c) }).Where(g => g.Key != CRarity.FREE))
             {
                 double currentProbability = probabilities[group.Key];
                 int missingCardsAmount = group.Sum(c => Math.Min(1, c.amount));
@@ -339,7 +355,7 @@ new Dictionary<CRarity, int>
         private double CalculateCardsCraftRequiredDust(IDictionary<CRarity, int> cardsCraftValue, Func<CardInCollection, int> missingCardsCount)
         {
             double totalRequiredDust = 0;
-            foreach (var group in _cards.GroupBy(c => c.Card.Rarity))
+            foreach (var group in _cards.GroupBy(c => c.Card.Rarity).Where(g => g.Key != CRarity.FREE))
             {
                 var currentRarity = group.Key;
                 double missingCards = group.Sum(missingCardsCount);
